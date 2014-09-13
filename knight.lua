@@ -9,44 +9,55 @@ local function map(array, func)
   return new_array
 end
 
-local function dependencies_met(module, dependencies)
-  for _, name in pairs(dependencies) do
-    if module.components[name] == nil then
-      return false
-    end
+
+function knight:module()
+  local module = {halted=false, components={}}
+
+  function module:halt()
+    self.halted = true
+    return self
   end
-  return true
-end
 
-local function get_dependencies(module, dependencies)
-  return map(dependencies, function(dependency)
-    if module.components[dependency] then
-      return module.components[dependency].component
-    else
-      return nil
-    end
-  end)
-end
-
-local function check_dependencies(module)
-  for name, component_info in pairs(module.components) do
-    local dependencies = component_info.dependencies
-    if dependencies_met(module, dependencies) then
-      component_info.component = component_info.constructor(unpack(get_dependencies(module, dependencies)))
-    end
+  function module:resume()
+    self.halted = false
+    self:check_dependencies()
+    return self
   end
-end
 
-function knight.module()
-  local module = {components = {}}
-
-  function module.component(name, dependencies, constructor)
-    module.components[name] = {
+  function module:component(name, dependencies, constructor)
+    self.components[name] = {
       dependencies=dependencies,
       constructor=constructor
     }
-    check_dependencies(module)
-    return module
+    self:check_dependencies()
+    return self
+  end
+
+  function module:dependencies_met(dependencies)
+    for _, name in pairs(dependencies) do
+      if self.components[name] == nil then return false end
+    end
+    return true
+  end
+
+  function module:get_dependencies(dependencies)
+    return map(dependencies, function(dependency)
+      if self.components[dependency] then
+        return self.components[dependency].component
+      else
+        return nil
+      end
+    end)
+  end
+
+  function module:check_dependencies()
+    if self.halted then return end
+    for name, component_info in pairs(self.components) do
+      local dependencies = component_info.dependencies
+      if self:dependencies_met(dependencies) then
+        component_info.component = component_info.constructor(unpack(self:get_dependencies(dependencies)))
+      end
+    end
   end
 
   return module

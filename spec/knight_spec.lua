@@ -14,13 +14,25 @@ describe("knight", function()
     local component_constructor2 = spy.new(function() return thing2 end)
     local component_constructor3 = spy.new(function(thing1, thing2) return thing3 end)
 
-    local dependencyTest = knight.module("dependencyTest")
-    .component("Thing1", {"Thing2"}, component_constructor1)
-    .component("Thing2", {}, component_constructor2)
-    .component("Thing3", {"Thing1", "Thing2"}, component_constructor3)
+    knight:module("dependencyTest")
+    :component("Thing1", {"Thing2"}, component_constructor1)
+    :component("Thing2", {}, component_constructor2)
+    :component("Thing3", {"Thing1", "Thing2"}, component_constructor3)
 
     assert.spy(component_constructor1).was.called_with(thing2)
     assert.spy(component_constructor2).was.called()
     assert.spy(component_constructor3).was.called_with(thing1, thing2)
+  end)
+
+  it("module execution can be delayed", function()
+    local thing1 = {thing=1}
+    local component_constructor1 = spy.new(function() end)
+
+    local module = knight:module("delayTest"):halt()
+    :component("Thing1", {}, component_constructor1)
+
+    assert.spy(component_constructor1).was_not.called()
+    module:resume()
+    assert.spy(component_constructor1).was.called()
   end)
 end)
