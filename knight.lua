@@ -1,5 +1,6 @@
 local knight = {}
-function knight.something()
-  return 4
+
+function knight.module()
 end
+
 return knight

@@ -1,7 +1,17 @@
 knight = require 'knight'
 
 describe("knight", function()
-  it("probably does some stuff", function()
-    assert.equal(knight.something(), 4)
+  it("accepts module definitions", function()
+    knight.module("moduleTest")
+  end)
+
+  it("allows chaining of components to modules", function()
+    knight.module("componentTest").component("Thing", [], function()
+    end)
+  end)
+
+  it("allows chaining of classes to modules", function()
+    knight.module("componentTest").class("Thing", [], function()
+    end)
   end)
 end)
