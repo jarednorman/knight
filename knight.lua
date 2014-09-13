@@ -1,4 +1,4 @@
-local knight = {}
+local knight = {modules={}}
 
 local function map(array, func)
   local new_array = {}
@@ -8,9 +8,9 @@ local function map(array, func)
   return new_array
 end
 
-
-function knight:module()
-  local module = {halted=false, components={}}
+function knight:module(name)
+  self.modules[name] = self.modules[name] or {halted=false, components={}}
+  local module = self.modules[name]
 
   function module:halt()
     self.halted = true

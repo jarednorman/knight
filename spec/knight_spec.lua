@@ -1,8 +1,3 @@
-inspect = (function()
-  local inspect = require 'inspect'
-  return function(arg) print(inspect(arg)) end
-end)()
-
 knight = require 'knight'
 
 describe("knight", function()
@@ -51,5 +46,21 @@ describe("knight", function()
     module:component("Thing2", {}, component_constructor2)
 
     assert.are.same(thing2, module:get_component("Thing2"))
+  end)
+
+  it("treats modules with the same name as the same module", function()
+    local thing1 = {thing=1}
+    local thing2 = {thing=2}
+    local component_constructor1 = spy.new(function() return thing1 end)
+    local component_constructor2 = spy.new(function() return thing2 end)
+
+    knight:module("identityTest")
+    :component("Thing1", {"Thing2"}, component_constructor1)
+
+    knight:module("identityTest")
+    :component("Thing2", {}, component_constructor2)
+
+    assert.spy(component_constructor1).was.called_with(thing2)
+    assert.spy(component_constructor2).was.called()
   end)
 end)
