@@ -1,4 +1,3 @@
--- FIXME: use normal Lua naming conventions
 local knight = {}
 
 local function map(array, func)
@@ -44,8 +43,6 @@ function knight:module()
     return map(dependencies, function(dependency)
       if self.components[dependency] then
         return self.components[dependency].component
-      else
-        return nil
       end
     end)
   end
@@ -57,6 +54,12 @@ function knight:module()
       if self:dependencies_met(dependencies) then
         component_info.component = component_info.constructor(unpack(self:get_dependencies(dependencies)))
       end
+    end
+  end
+
+  function module:get_component(name)
+    if self.components[name] then
+      return self.components[name].component
     end
   end
 

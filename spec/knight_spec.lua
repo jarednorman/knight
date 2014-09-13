@@ -24,7 +24,7 @@ describe("knight", function()
     assert.spy(component_constructor3).was.called_with(thing1, thing2)
   end)
 
-  it("module execution can be delayed", function()
+  it("allows module execution can be delayed", function()
     local thing1 = {thing=1}
     local component_constructor1 = spy.new(function() end)
 
@@ -34,5 +34,22 @@ describe("knight", function()
     assert.spy(component_constructor1).was_not.called()
     module:resume()
     assert.spy(component_constructor1).was.called()
+  end)
+
+  it("exposes components on the module", function()
+    local thing1 = {thing=1}
+    local thing2 = {thing=2}
+    local component_constructor1 = spy.new(function() return thing1 end)
+    local component_constructor2 = spy.new(function() return thing2 end)
+
+    local module = knight:module("delayTest")
+    :component("Thing1", {}, component_constructor1)
+
+    assert.are.same(thing1, module:get_component("Thing1"))
+    assert.falsy(module:get_component("Thing2"))
+
+    module:component("Thing2", {}, component_constructor2)
+
+    assert.are.same(thing2, module:get_component("Thing2"))
   end)
 end)
