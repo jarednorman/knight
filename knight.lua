@@ -9,7 +9,7 @@ local function map(array, func)
   return new_array
 end
 
-local function dependenciesMet(module, dependencies)
+local function dependencies_met(module, dependencies)
   for _, name in pairs(dependencies) do
     if module.components[name] == nil then
       return false
@@ -18,8 +18,8 @@ local function dependenciesMet(module, dependencies)
   return true
 end
 
-local function getDependencies(module, dependencyList)
-  return map(dependencyList, function(dependency)
+local function get_dependencies(module, dependencies)
+  return map(dependencies, function(dependency)
     if module.components[dependency] then
       return module.components[dependency].component
     else
@@ -28,11 +28,11 @@ local function getDependencies(module, dependencyList)
   end)
 end
 
-local function checkDependencies(module)
-  for name, componentInfo in pairs(module.components) do
-    local dependencies = componentInfo.dependencies
-    if dependenciesMet(module, dependencies) then
-      componentInfo.component = componentInfo.constructor(unpack(getDependencies(module, dependencies)))
+local function check_dependencies(module)
+  for name, component_info in pairs(module.components) do
+    local dependencies = component_info.dependencies
+    if dependencies_met(module, dependencies) then
+      component_info.component = component_info.constructor(unpack(get_dependencies(module, dependencies)))
     end
   end
 end
@@ -45,7 +45,7 @@ function knight.module()
       dependencies=dependencies,
       constructor=constructor
     }
-    checkDependencies(module)
+    check_dependencies(module)
     return module
   end
 
