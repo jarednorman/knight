@@ -87,6 +87,7 @@ application design pattern, but it seemed better than what I had been doing.
 
 - [x] Evaluate dependencies
 - [x] Delay evaluation
+- [ ] require_tree
 - [ ] Detect circular dependencies
 - [ ] Prevent overwriting components already used as dependencies to evaluate other components
 
