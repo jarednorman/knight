@@ -50,6 +50,13 @@ end)
 -- foo_service.lua
 knight:module("MyApplication")
 :component("foo_service", {}, function()
+  local FooService = class("FooService")
+
+  function FooService:get_some_foos()
+    {"foo", "foo", "foo"}
+  end
+
+  return FooService:new()
 end)
 ```
 
