@@ -26,7 +26,7 @@ dependency, Knight has no dependecies.)
 -- some_subclass.lua
 knight:module("MyApplication")
 :component("SomeSubclass", {"SomeClass"}, function(SomeClass)
-  local SomeSubclass = class("SomeSubclass, SomeClass)
+  local SomeSubclass = class("SomeSubclass", SomeClass)
 
   function SomeSubclass:bar()
     print(foos)
