@@ -1,69 +1,65 @@
-local knight = {modules={}}
+local inspect = require 'inspect'
 
 local function map(array, func)
   local new_array = {}
-  for index, value in ipairs(array) do
-    new_array[index] = func(value)
-  end
+  for index, value in ipairs(array) do new_array[index] = func(value) end
   return new_array
 end
 
-function knight:module(name)
-  self.modules[name] = self.modules[name] or {halted=false, components={}}
-  local module = self.modules[name]
+local knight = {}
+local modules= {}
 
-  function module:halt()
-    self.halted = true
-    return self
-  end
+function knight.module(name)
+  if modules[name] then return modules[name] end
 
-  function module:resume()
-    self.halted = false
-    self:check_dependencies()
-    return self
-  end
+  modules[name] = {}
+  local module = modules[name]
+  local components = {}
+  local dependency_sweep
+  local dependencies_met
+  local get_dependencies
 
-  function module:component(name, dependencies, constructor)
-    self.components[name] = {
+  modules[name].component = function(name, dependencies, constructor)
+    components[name] = {
       dependencies=dependencies,
       constructor=constructor
     }
-    self:check_dependencies()
-    return self
+    dependency_sweep()
+    return module
   end
 
-  function module:dependencies_met(dependencies)
+  dependency_sweep = function()
+    local found_one = false
+    for name, component in pairs(components) do
+      local dependencies = component.dependencies
+
+      if dependencies_met(dependencies) and not component.result then
+        found_one = true
+        component.result = component.constructor(unpack(get_dependencies(dependencies)))
+      end
+    end
+
+    if found_one then dependency_sweep() end
+  end
+
+  dependencies_met = function(dependencies)
     for _, name in pairs(dependencies) do
-      if self.components[name] == nil then return false end
+      if not (components[name] and components[name].result) then
+        return false
+      end
     end
     return true
   end
 
-  function module:get_dependencies(dependencies)
+  get_dependencies = function(dependencies)
     return map(dependencies, function(dependency)
-      if self.components[dependency] then
-        return self.components[dependency].component
+      if components[dependency] then
+        return components[dependency].result
       end
     end)
   end
 
-  function module:check_dependencies()
-    if self.halted then return end
-    for name, component_info in pairs(self.components) do
-      local dependencies = component_info.dependencies
-      if self:dependencies_met(dependencies) then
-        component_info.component = component_info.constructor(unpack(self:get_dependencies(dependencies)))
-      end
-    end
-  end
-
-  function module:get_component(name)
-    if self.components[name] then
-      return self.components[name].component
-    end
-  end
-
-  return module
+  return modules[name]
 end
 
 return knight
