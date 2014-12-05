@@ -37,4 +37,13 @@ describe("knight", function()
     assert.spy(component_constructor1).was.called_with(thing2)
     assert.spy(component_constructor2).was.called(1)
   end)
+
+  it("exposes components for testing purposes", function()
+    knight.module("testTest")
+    .component('testableThing', {'dependency'}, function(dependency)
+      return dependency
+    end)
+
+    assert(knight.module("testTest").create_component('testableThing', {'foo'}) == 'foo')
+  end)
 end)

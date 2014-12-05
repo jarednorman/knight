@@ -28,6 +28,10 @@ function knight.module(name)
     return module
   end
 
+  modules[name].create_component = function(name, dependencies)
+    return components[name].constructor(unpack(dependencies))
+  end
+
   dependency_sweep = function()
     local found_one = false
     for name, component in pairs(components) do
