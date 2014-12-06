@@ -1,5 +1,3 @@
-local inspect = require 'inspect'
-
 local function map(array, func)
   local new_array = {}
   for index, value in ipairs(array) do new_array[index] = func(value) end
