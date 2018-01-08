@@ -38,6 +38,20 @@ describe("knight", function()
     assert.spy(component_constructor2).was.called(1)
   end)
 
+  it("allows falsey values for components", function()
+    local component_constructor1 = spy.new(function() end)
+    local component_constructor2 = spy.new(function() end)
+
+    knight.module("falseyTest")
+    .component("Thing2", {}, component_constructor2)
+
+    knight.module("falseyTest")
+    .component("Thing1", {"Thing2"}, component_constructor1)
+
+    assert.spy(component_constructor2).was.called(1)
+    assert.spy(component_constructor1).was.called(1)
+  end)
+
   it("exposes components for testing purposes", function()
     knight.module("testTest")
     .component('testableThing', {'dependency'}, function(dependency)
